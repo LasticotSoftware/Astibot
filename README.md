@@ -42,7 +42,7 @@ Astibot can run on any computer capable of runnning Python 3, including Raspberr
 
 ## Development
 
-![Alt text](/relative/path/to/img.jpg?raw=true "Astibot software architecture")
+![Alt text](/doc/astibot_architecture.png?raw=true "Astibot software architecture")
 
 ## Known limitations
 * In the current version, limit orders are considered to be free: that is not the case anymore since Coinbase Pro increased all their fees. Astibot needs to be updated to take this in consideration for the profit computation and trading strategy.
