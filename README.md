@@ -42,10 +42,14 @@ Astibot can run on any computer capable of runnning Python 3, including Raspberr
 
 ## Development
 
+I think current Astibot version could be a good starting point to implement more more sophisticated strategies.
+To understand the general breakdown, a diagram is worth thousand words. Top modules call services from the modules below.
 ![Alt text](/doc/astibot_architecture.png?raw=true "Astibot software architecture")
 
 ## Known limitations
 * In the current version, limit orders are considered to be free: that is not the case anymore since Coinbase Pro increased all their fees. Astibot needs to be updated to take this in consideration for the profit computation and trading strategy.
+* Astibot only implements the Coinbase Pro interface. It would not be that hard to create a "BinanceControler", "BitfinexControler" ... to add multiplatform support. These specific controlers could herit from a more generic and abstrct controler seen from higher level modules (polymorphism).
+* Some modules are too oversize and could be splitted into more micro modules (UIGraph for example is too big).
 
 
 
