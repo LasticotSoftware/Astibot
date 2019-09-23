@@ -40,9 +40,20 @@ Astibot can run on any computer capable of runnning Python 3, including Raspberr
 1. python Astibot.py
 2. At first start-up, enter your Coinbase Pro API keys (view and trade permissions are required)
 
+## Results
+
+Let's talk about the key topic! I have run Astibot serveral weeks on my Raspberry pi.
+Here are my conclusions:
+* Astibot needs volatility to make profit: as an order of magnitude, 0.8-1 % variations on the short term chart (equivalent to a 15 min chart) is a minimum. These variations are required to detect dips and tops properly with the smoothing indicators, and to cover the buy and sell fees.
+* Astibot runs well during sideways periods. If volume and volatility are good, Astibot can outperform the chart.
+* Astibot is not interesting during a bull market. Astibot does not find dips, and because of the risk line, Astibot never buys when price is too high. So, it is more interesting to hodl in these market conditions.
+* Astibot is not profitable during a bear market: it will detect a lot of dips, buy these dips and it will not be able to close a trade with profit because price will have decreased.
+To sum up, the mose difficult part is to know **when** it is interesting to run Astibot for the next hours or days. 
+
+
 ## Development
 
-I think current Astibot version could be a good starting point to implement more more sophisticated strategies.
+I think current Astibot version could be a good starting point to implement more sophisticated strategies.
 To understand the general breakdown, a diagram is worth thousand words. Top modules call services from the modules below.
 ![Alt text](/doc/astibot_architecture.png?raw=true "Astibot software architecture")
 
