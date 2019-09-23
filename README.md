@@ -50,9 +50,9 @@ Here are my conclusions:
 * Astibot is not profitable during a bear market: it will detect a lot of dips, buy these dips and it will not be able to close a trade with profit because price will have decreased.
 
 To sum up, the mose difficult part is to know **when** it is interesting to run Astibot for the next hours or days. 
-But, there's no rule. Use the Simulation mode* and tune the cursors to try :) 
+But, there's no rule. Use the Simulation mode and tune the cursors to try :) 
 
-* Simulation mode does not perfectly simulate the past market conditions (order book is not simulated) and does not predicts future profits!
+
 
 ## Development
 
