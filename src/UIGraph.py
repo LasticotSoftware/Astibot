@@ -31,8 +31,7 @@ from UIInfo import UIInfo
 class TimeAxisItem(pg.AxisItem):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.localTimezone = pytz.timezone(str(get_localzone()))
-        #self.localTimezone = pytz.timezone('America/New_York')   
+        self.localTimezone = pytz.timezone(str(get_localzone())) 
 
     def tickStrings(self, values, scale, spacing):
 
@@ -117,7 +116,6 @@ class UIGraph():
         
         # Customize main widget (window)
         self.mainWidget.setStyleSheet("background-color:#203044;")
-        # self.mainWidget.setStyleSheet("background-color:blue;")
         self.mainWidget.setAutoFillBackground(True);
                
         # By default consider the data series will start now. This can be overridden 
@@ -243,7 +241,6 @@ class UIGraph():
     def UIGR_AreNewSamplesRequested(self):
         if (self.areNewSamplesRequested == True):
             self.areNewSamplesRequested = False
-            #time.sleep(0.1) #################### DEBUG ##########################################"
             return True
         else:
             return False
@@ -562,14 +559,12 @@ class UIGraph():
         self.strPlot1Title = str(self.theSettings.SETT_GetSettings()["strTradingPair"]) + ' Coinbase Pro Market Price (' + str(self.theSettings.SETT_GetSettings()["strFiatType"]) + ')'
         self.plot1 = pg.PlotWidget(title=self.strPlot1Title, axisItems={'bottom': TimeAxisItem(orientation='bottom')})        
         self.plot1.setYRange(self.minInPlot1, self.maxInPlot1)
-        #self.plot1.showGrid(x=True,y=True,alpha=0.1)
         self.plot1.setMouseEnabled(False, False) # Mettre False, True pour release
         self.plot1.setMenuEnabled(False)
         axis = self.plot1.getAxis('bottom')  # This is the trick
         axis.setStyle(textFillLimits = [(0, 0.7)])
         
         #self.plot1.plotItem.vb.setBackgroundColor((15, 25, 34, 255))
-        #self.plot2 = pg.PlotWidget(title='Astibot decision indicator (normalized)', axisItems={'bottom': TimeAxisItem(orientation='bottom')})
         self.plot2 = pg.PlotWidget(title='Astibot decision indicator (normalized)')
         self.plot2.showGrid(x=True,y=True,alpha=0.1)
         self.plot2.setYRange(-100, 100)
@@ -582,8 +577,6 @@ class UIGraph():
         self.mainGridLayout.addWidget(self.plot2, 10, 1, 1, 2)
    
         # Graph curves initialization
-        # Graph 1 (Price vs. Time) curves initialization
-        #self.plot1.addLegend(offset=(30, 220), size=(100,100))
         self.plot1GraphLivePrice = self.plot1.plot(x=self.graphDataTime, y=self.graphDataBitcoinPrice, name='     Price') # , clipToView=True
         self.plot1GraphLivePrice.setPen(color=(220,220,220), width=3)
         self.plot1GraphSmoothPriceFast = self.plot1.plot(x=self.graphDataTime, y=self.graphDataBitcoinPriceSmoothFast, name='    Price Fast MA')
@@ -598,9 +591,7 @@ class UIGraph():
         # Graph 2 (Indicators) curves initialization
         self.plot2GraphIndicatorMACD = self.plot2.plot(x=self.graphDataTime, y=self.graphDataIndicatorMACD, pen='y', name='     MACD')
    
-        # DEBUG
         self.graphicObject = pg.GraphicsObject()
-#         self.graphicObject.informViewBoundsChanged() # Force graph redraw
         
     def initInitialTimeVector(self, firstFutureSampleTimeStamp):
         np.set_printoptions(suppress=True)
@@ -608,20 +599,17 @@ class UIGraph():
         startTimeValue = firstFutureSampleTimeStamp - (self.nbPointsOnPlot * timeBetweenRetrievedSamplesInSec)
         tempTimeVector = np.linspace(startTimeValue, firstFutureSampleTimeStamp, self.nbPointsOnPlot)
         self.timeOfLastSampleDisplayed = startTimeValue
-#         for element in tempTimeVector:
-#             print("UIGR - initInitialTimeVector with %f" % element)
+
         return tempTimeVector
 
-    # NOTE FD : Rejeter les données temporellement inférieures au temps min de l'axe X (gestion du cas du rejeu de données historiques)
+
     def UIGR_updateNextIterationData(self, newTime, newSpotPrice, newSmoothPriceFast, newSmoothPriceSlow, newRiskLineRawAvgValue, newIndicatorMACD):
         # Don't append data that were before the oldest time in the graphs and that are older than the last sample displayed
         if (newTime > self.timeOfLastSampleDisplayed):
              
-            #print("UIGR_updateNextIterationData : %s" % str(newTime -self.timeOfLastSampleDisplayed))
-            #print("UIGR_updateNextIterationData : Time= %s" % str(newTime))
             self.graphDataTime[-1] = newTime
             self.timeOfLastSampleDisplayed = newTime
-            self.graphDataBitcoinPrice[-1] = newSpotPrice# + randint(0, 50)
+            self.graphDataBitcoinPrice[-1] = newSpotPrice
             self.graphDataBitcoinPriceSmoothFast[-1] = newSmoothPriceFast
             self.graphDataBitcoinPriceSmoothSlow[-1] = newSmoothPriceSlow
             self.graphDataBitcoinPriceMarker1[-1] = 0
@@ -641,15 +629,8 @@ class UIGraph():
             self.graphDataBitcoinRiskLine[:-1] = self.graphDataBitcoinRiskLine[1:]
             self.graphDataIndicatorMACD[:-1] = self.graphDataIndicatorMACD[1:]
              
-#             if(self.totalNbIterations > 200): 
-#                 for element in self.graphDataTime:
-#                     print("time %f" % element)
-#             print("RECENT DATA p ============== %s" % self.graphDataBitcoinPrice)
-             
             self.totalNbIterations = self.totalNbIterations + 1
-            #print(self.totalNbIterations)
-#         else:
-#             print("UIGR - Rejected Sample")
+
 
     # Experimentation pour live trading aussi
     def UIGR_updateGraphsSimuTimer(self):
