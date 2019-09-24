@@ -34,12 +34,8 @@ class TransactionManager(object):
         self.platformTakerFeeInPercent = float(self.theSettings.SETT_GetSettings()["platformTakerFee"]) * 0.01
         self.pendingNotificationToSend = ""
 
-#         if (self.currentBuyAmountInCryptoWithoutFee > theConfig.MIN_BTC_AMOUNT_REQUESTED_TO_SELL):
-#             print("TRNM - WARNING : Non null Crypto Balance at start-up: %s. Will try to sell it." % self.currentBuyAmountInCryptoWithoutFee)
-#             self.currentBuyAmountInCryptoWithoutFee = self.CryptoAccountBalance
-
         self.buyTimeInTimeStamp = 0
-        self.currentBuyInitialPriceInEUR = 0 #theConfig.PENDING_BTC_BUY_PRICE
+        self.currentBuyInitialPriceInEUR = 0
 
         self.theUIGraph.UIGR_updateAccountsBalance(round(self.FiatAccountBalance, 2), round(self.CryptoAccountBalance, 6))
         self.theUIGraph.UIGR_updateTotalProfit(self.realProfit, self.theoricalProfit, self.percentageProfit, False)
@@ -112,8 +108,7 @@ class TransactionManager(object):
         self.orderPlacingState = "NONE"
 
         if (theConfig.CONFIG_INPUT_MODE_IS_REAL_MARKET == False):
-            #self.theUIGraph.UIGR_updateAccountsBalance(self.FIATAccountBalanceSimulated, self.cryptoAccountBalanceSimulated)
-            pass # On reste en affichage Simu car c'était la dernière activité
+            pass 
         else:
             # In real trading mode let GDAX controler update the accounts labels. TRNM will manage
             # money / refresh itself when initiating the new trading session
@@ -129,6 +124,7 @@ class TransactionManager(object):
         return self.theGDAXControler.GDAX_GetBTCAccountBalance()
 
     def TRNM_StartBuyOrSellAttempt(self, buyOrSell, MinMaxPrice):
+        
         if (buyOrSell == "BUY"):
             print("TRNM - Limit %s requested, max buy price is %s %s" % (buyOrSell, round(MinMaxPrice, 2), self.theSettings.SETT_GetSettings()["strFiatType"]))
             self.theUIGraph.UIGR_updateInfoText("Placing %s order, max buy price is %s %s" % (buyOrSell, round(MinMaxPrice, 2), self.theSettings.SETT_GetSettings()["strFiatType"]), False)
@@ -137,8 +133,6 @@ class TransactionManager(object):
             self.theUIGraph.UIGR_updateInfoText("Placing %s order, min sell price is %s %s" % (buyOrSell, round(MinMaxPrice, 2), self.theSettings.SETT_GetSettings()["strFiatType"]), False)
         else:
             print("TRNM - Limit %s requested, unknown order type" % buyOrSell)
-        
-        
         
         if (theConfig.CONFIG_INPUT_MODE_IS_REAL_MARKET == True):
             
@@ -197,12 +191,7 @@ class TransactionManager(object):
             buyCapabilityInCrypto = self.FIATAccountBalanceSimulated / self.theMarketData.MRKT_GetLastRefPrice()
         return buyCapabilityInCrypto
 
-    def computeProfitEstimation(self, isSellFeeApplied, soldAmountInCryptoWithFee):
-#         if (theConfig.CONFIG_INPUT_MODE_IS_REAL_MARKET == True):
-#             currentMidMarketPrice = self.theGDAXControler.GDAX_GetRealTimePriceInEUR()
-#         else:
-#             currentMidMarketPrice = self.theMarketData.MRKT_GetLastRefPrice()
-#             
+    def computeProfitEstimation(self, isSellFeeApplied, soldAmountInCryptoWithFee):         
         # Don't include fee to get actual amount of money invested by the user (its cost for user point of view), not the amount of money actually invested in the platform after deducing the fee
         InvestmentInFiat = self.currentBuyInitialPriceInEUR * self.currentBuyAmountInCryptoWithoutFee
         if (isSellFeeApplied):
@@ -214,6 +203,7 @@ class TransactionManager(object):
         print("TRNM - ComputeProfitEstimation : Sell price with fee: %s, fee applied? %s" % (SellPriceWithFeeInFiat, isSellFeeApplied))
         profitEstimation = (SellPriceWithFeeInFiat - InvestmentInFiat)
         return [profitEstimation, SellPriceWithFeeInFiat]
+        
         
     def TRNM_BuyNow(self):
         if ((self.theGDAXControler.GDAX_IsConnectedAndOperational() == "True") or (theConfig.CONFIG_INPUT_MODE_IS_REAL_MARKET == False)):
@@ -422,16 +412,15 @@ class TransactionManager(object):
                         self.SimulateSellOrderFilled()
                         return "FILLED"
                     else:
-                        return "ONGOING" # Mettre une probabilité de vente
+                        return "ONGOING" 
                 else:
                     print("TRNM - GetOngoingLimitOrderState: SellTriggerInPercent null, simulate MACD-based sell")
                     self.averageSellPriceInFiat = self.theMarketData.MRKT_GetLastRefPrice()
                     self.SimulateSellOrderFilled()
                     # MACD-based sell trigger
-                    return "FILLED" # Mettre une probabilité de vente
+                    return "FILLED" 
             else:
                 print("TRNM - GetOngoingLimitOrderState: Unknown orderPlacingType. Filled returned.")                 
-                # TODO : mettre une probabilité de filled entre 0 et 1. Si 0, le SW fonctionnera que en market order sur les seuils B2 / S2
                 return "FILLED"
         else: # Real market        
             self.threadOrderPlacingLock.acquire()
@@ -484,7 +473,6 @@ class TransactionManager(object):
                                 self.isOrderPlacingActive = False # Set to false before display                                            
                                 self.performBuyDisplayActions(True)
                             elif (self.orderPlacingType == "SELL"):
-                                # Gérer vente et calculer gains
                                 self.currentSoldAmountInCryptoViaLimitOrder = self.theGDAXControler.GDAX_GetAveragePriceInFiatAndSizeFilledInCrypto()[1]
                                 self.averageSellPriceInFiat = self.theGDAXControler.GDAX_GetAveragePriceInFiatAndSizeFilledInCrypto()[0]
                                 profitEstimationInFiat = self.computeProfitEstimation(False, self.currentSoldAmountInCryptoViaLimitOrder)[0]
@@ -553,8 +541,8 @@ class TransactionManager(object):
                                 else:
                                     # Sell order is from a sellTrigger : do not try to replace it on top of the book
                                     pass       
-                    # Replace order on top of the book (or place it for the first time)
-                    
+                                
+                    # Replace order on top of the book (or place it for the first time)                    
                     if (isOrderFilled == False):
                         if ((isReplaceOrderNeeded) or (self.orderPlacingCurrentPriceInFiat == 0)):
                             statusIsOk = True
@@ -582,10 +570,6 @@ class TransactionManager(object):
                             elif (self.orderPlacingType == "SELL"):
                                 print("TRNM - threadOrderPlacing: Placing / Replacing a Sell limit order on the top of the order book")
                                 sellAmountInCrypto = self.theGDAXControler.GDAX_GetCryptoAccountBalance() + self.theGDAXControler.GDAX_GetCryptoAccountBalanceHeld() - theConfig.CONFIG_CRYPTO_PRICE_QUANTUM                                
-                                
-                                
-                                # REMPLIR orderPlacingCurrentPriceInFiat quand on place un ordre pour la première fois
-                                
                                 # Check if sell price is not too high
                                 if (liveBestAskPrice > self.orderPlacingMinMaxPrice):
                                     self.orderPlacingCurrentPriceInFiat = liveBestAskPrice
@@ -633,7 +617,6 @@ class TransactionManager(object):
             buyTimeStr = datetime.fromtimestamp(int(self.buyTimeInTimeStamp)).strftime('%H:%M')
             sellThreshold = self.currentBuyInitialPriceInEUR * (theConfig.CONFIG_MIN_PRICE_ELEVATION_RATIO_TO_SELL + 2*self.platformTakerFeeInPercent) # Not the official one : for display only. Trader class manages this actual feature.
             self.theUIGraph.UIGR_updateInfoText("%s - %s %s Bought @ %s %s - Waiting for a sell opportunity above %s %s" % (buyTimeStr, round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 2), self.theSettings.SETT_GetSettings()["strCryptoType"]), False)            
-            #self.TRNM_RefreshAccountBalancesAndProfit()
             theNotifier.SendWhatsappMessage("*BUY* %s %s @ %s %s - Waiting for a sell opportunity above %s %s" % (round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 2), self.theSettings.SETT_GetSettings()["strFiatType"]))
         
             self.theUIGraph.UIGR_addMarker(1)
