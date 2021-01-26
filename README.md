@@ -28,13 +28,9 @@ Astibot bases its decisions on 2 real-time indicators:
 
 Astibot can run on any computer capable of runnning Python 3, including Raspberry Pi (very convenient for 24/7 trading).
 
-#### Required dependencies
-* Python 3
-* PyQt5
-* pyqtgraph
-* ctypes
-* numpy
-* cbpro
+#### Install required dependencies
+
+pip3 install pyqt5 pyqtgraph tzlocal cbpro twilio scipy ipdb
 
 #### Start-up
 
