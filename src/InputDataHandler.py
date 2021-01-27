@@ -35,15 +35,13 @@ class InputDataHandler(object):
         else:
             return self.PreloadHistoricDataStatus
     
-    # Point d'entrée de APP pour chargement de données historiques
-    # Soit avant une simu (argument a False) ou a l'init ou avant trading (argument a True on joue les sample)
+
     def PreloadHistoricData(self, displayWholeBufferAtTheEnd, nbHoursToPreload):
         self.nbHoursToPreload = nbHoursToPreload
         
         # First call in a sequence, launch loading thread
         if (self.PreloadHistoricDataStatus != "Ongoing"):
             self.PreloadHistoricDataStatus = "Ongoing"
-            # Ouvrir thread ici, retourner Ongoing pendant que ça charge
             self.threadLoadHistoricData = threading.Timer(0, self.LoadHistoricData, [displayWholeBufferAtTheEnd])
             self.threadLoadHistoricData.start()
         else:

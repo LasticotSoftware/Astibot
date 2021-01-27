@@ -1,4 +1,4 @@
-from twilio.rest import Client
+#from twilio.rest import Client
 import TradingBotConfig as theConfig
 
 def SendWhatsappMessage(messageToSend):

@@ -205,7 +205,7 @@ class GDAXControler(cbpro.OrderBook):
         if (self.bFiatAccountExists == True):
             #print("GDAX - Exists")
             try:
-                balanceToReturn = (round(float(self.FiatAccount['available']), 2))
+                balanceToReturn = (round(float(self.FiatAccount['available']), 8))
                 return balanceToReturn
             except BaseException as e:
                 print("GDAX - Error retrieving fiat account balance. Inconsistent data in fiat account object.")
@@ -219,7 +219,7 @@ class GDAXControler(cbpro.OrderBook):
         if (self.bFiatAccountExists == True):
             #print("GDAX - Exists")
             try:
-                balanceToReturn = (round(float(self.FiatAccount['hold']), 2))
+                balanceToReturn = (round(float(self.FiatAccount['hold']), 8))
                 return balanceToReturn
             except BaseException as e:
                 print("GDAX - Error retrieving fiat hold account balance. Inconsistent data in fiat account object.")
@@ -232,23 +232,26 @@ class GDAXControler(cbpro.OrderBook):
     def GDAX_GetCryptoAccountBalance(self):
         if (self.bCryptoAccountExists == True):
             try:
-                balanceToReturn = (round(float(self.CryptoAccount['available']), 7))
+                balanceToReturn = (round(float(self.CryptoAccount['available']), 8))
                 return balanceToReturn
             except BaseException as e:
                 print("GDAX - Error retrieving crypto account balance. Inconsistent data in crypto account object.")
                 return 0
         else:
+            print("GDAX - Error retrieving crypto account balance. Crypto account does not exist")
             return 0
 
     def GDAX_GetCryptoAccountBalanceHeld(self):
         if (self.bCryptoAccountExists == True):
             try:
-                balanceToReturn = (round(float(self.CryptoAccount['hold']), 7))
+                balanceToReturn = (round(float(self.CryptoAccount['hold']), 8))
+                print("GDAX - Returned held balance %s for %s" % (balanceToReturn, self.productCryptoStr))
                 return balanceToReturn
             except BaseException as e:
                 print("GDAX - Error retrieving crypto hold account balance. Inconsistent data in crypto account object.")
                 return 0
         else:
+            print("GDAX - Error retrieving crypto account balance. Crypto account does not exist")
             return 0
         
     # Returns the Available BTC balance (ie. money that can be used and that is not held for any pending order)
@@ -271,8 +274,16 @@ class GDAXControler(cbpro.OrderBook):
             for currentAccount in self.accounts:
                 if currentAccount['currency'] == self.productCryptoStr:
                     self.CryptoAccount = currentAccount
+                    #print("CRYPTO ACCOUNT")
+                    #print(self.CryptoAccount)
+                    #print(self.CryptoAccount['balance'])
+                    #print(self.CryptoAccount['available'])
                 if currentAccount['currency'] == self.productFiatStr:
                     self.FiatAccount = currentAccount
+                    #print("FIAT ACCOUNT")
+                    #print(self.FiatAccount)
+                    #print(self.FiatAccount['balance'])
+                    #print(self.FiatAccount['available'])                    
 
             if (theConfig.CONFIG_INPUT_MODE_IS_REAL_MARKET == True):
                 self.theUIGraph.UIGR_updateAccountsBalance(self.GDAX_GetFiatAccountBalance(), self.GDAX_GetCryptoAccountBalance())
@@ -476,7 +487,18 @@ class GDAXControler(cbpro.OrderBook):
 
             # Send Limit order
             amountToBuyInCrypto = round(amountToBuyInCrypto, 8)
-            buyPriceInFiat = math.floor(buyPriceInFiat*100)/100   # Don't use round because order could be placed on the other side of the spread -> rejected
+            
+            # Don't use round because order could be placed on the other side of the spread -> rejected
+            # Prix exprimé en BTC, arrondi variable
+            if (self.productFiatStr == "BTC"):                
+                if (self.productCryptoStr == "LTC"):
+                    buyPriceInFiat = math.floor(buyPriceInFiat*1000000)/1000000 # Floor à 0.000001
+                else:
+                    buyPriceInFiat = math.floor(buyPriceInFiat*100000)/100000 # Floor à 0.00001
+            else: # Prix exprimé en Fiat, arrondi à 0.01
+                buyPriceInFiat = math.floor(buyPriceInFiat*100)/100
+            
+            
             buyRequestReturn = self.clientAuth.buy(price=str(buyPriceInFiat), size=str(amountToBuyInCrypto), product_id=self.productStr, order_type='limit', post_only=True) # with Post Only
             print("GDAX - Actual buy sent with LIMIT order set to %s. Amount is %s Crypto" % (buyPriceInFiat, amountToBuyInCrypto))
             print("GDAX - Limit order placing sent. Request return is: %s" % buyRequestReturn)
@@ -525,7 +547,17 @@ class GDAXControler(cbpro.OrderBook):
             
             # Send Limit order
             amountToSellInCrypto = round(amountToSellInCrypto, 8)
-            sellPriceInFiat = math.floor(sellPriceInFiat*100)/100
+            
+            # Don't use round because order could be placed on the other side of the spread -> rejected            
+            # Prix exprimé en BTC, arrondi variable
+            if (self.productFiatStr == "BTC"):                
+                if (self.productCryptoStr == "LTC"):
+                    sellPriceInFiat = math.floor(sellPriceInFiat*1000000)/1000000 # Floor à 0.000001
+                else:
+                    sellPriceInFiat = math.floor(sellPriceInFiat*100000)/100000 # Floor à 0.00001
+            else: # Prix exprimé en Fiat, arrondi à 0.01
+                sellPriceInFiat = math.floor(sellPriceInFiat*100)/100
+                
             sellRequestReturn = self.clientAuth.sell(price=str(sellPriceInFiat), size=str(amountToSellInCrypto), product_id=self.productStr, order_type='limit', post_only=True) # with Post Only
             print("GDAX - Actual sell sent with LIMIT order set to %s. Amount is %s Crypto" % (sellPriceInFiat, amountToSellInCrypto))
             print("GDAX - Limit order placing sent. Request return is: %s" % sellRequestReturn)
@@ -737,7 +769,7 @@ class GDAXControler(cbpro.OrderBook):
                     time.sleep(0.250)
                 print("GDAX - Using public client to retrieve historic prices")
                 
-            print("GDAX - Taille HistoricDataSlice: %s" % len(HistoricDataSlice))
+            print("GDAX - Size of HistoricDataSlice: %s" % len(HistoricDataSlice))
             
             try: # parfois le reversed crash. Pas de data dans la slice ?
                 for slice in reversed(HistoricDataSlice):

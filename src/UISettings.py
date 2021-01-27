@@ -94,6 +94,12 @@ class UISettings(QtGui.QWidget):
             self.comboTradingPair.setCurrentIndex(8)
         elif (self.strTradingPair == "ETC-EUR"):
             self.comboTradingPair.setCurrentIndex(9)
+        elif (self.strTradingPair == "BCH-BTC"):
+            self.comboTradingPair.setCurrentIndex(10)                                                                    
+        elif (self.strTradingPair == "ETH-BTC"):
+            self.comboTradingPair.setCurrentIndex(11)
+        elif (self.strTradingPair == "LTC-BTC"):
+            self.comboTradingPair.setCurrentIndex(12)            
                                                           
         self.strFiatType = self.theSettings.SETT_GetSettings()["strFiatType"]
         self.strCryptoType = self.theSettings.SETT_GetSettings()["strCryptoType"]
@@ -127,6 +133,7 @@ class UISettings(QtGui.QWidget):
         self.lblAutoSellPercent.setText(str(self.autoSellThreshold) + " %")
         
         self.txtSimulatedFiatBalance.setText(str(self.theSettings.SETT_GetSettings()["simulatedFiatBalance"]))
+        self.txtSimulatedFiatBalance.text().replace('.',',') # TODO: ok for french only
         
         self.simulationSpeed = self.theSettings.SETT_GetSettings()["simulationSpeed"]
         self.sliderSimulationSpeed.setValue(int(self.simulationSpeed))
@@ -168,7 +175,7 @@ class UISettings(QtGui.QWidget):
             settingsList["platformTakerFee"] = self.platformTakerFee
             settingsList["sellTrigger"] = self.sellTrigger
             settingsList["autoSellThreshold"] = self.autoSellThreshold
-            settingsList["simulatedFiatBalance"] = self.txtSimulatedFiatBalance.text()
+            settingsList["simulatedFiatBalance"] = self.txtSimulatedFiatBalance.text().replace(',','.')
             settingsList["simulationSpeed"] = self.simulationSpeed
             settingsList["simulationTimeRange"] = self.simulationTimeRange
             
@@ -224,7 +231,19 @@ class UISettings(QtGui.QWidget):
         elif (self.comboTradingPair.currentIndex() == 9):
             self.strTradingPair = "ETC-EUR"
             self.strFiatType = "EUR"
-            self.strCryptoType = "ETC"                                                                                               
+            self.strCryptoType = "ETC"          
+        elif (self.comboTradingPair.currentIndex() == 10):
+            self.strTradingPair = "BCH-BTC"
+            self.strFiatType = "BTC"
+            self.strCryptoType = "BCH"
+        elif (self.comboTradingPair.currentIndex() == 11):
+            self.strTradingPair = "ETH-BTC"
+            self.strFiatType = "BTC"
+            self.strCryptoType = "ETH"      
+        elif (self.comboTradingPair.currentIndex() == 12):
+            self.strTradingPair = "LTC-BTC"
+            self.strFiatType = "BTC"
+            self.strCryptoType = "LTC"                                                                                                           
         else:
             pass
         
@@ -289,7 +308,8 @@ class UISettings(QtGui.QWidget):
     def checkParametersValidity(self):
         # Check amount of money to virtually invest in simulation mode
         if (self.txtSimulatedFiatBalance.text() != ""):
-            if ((int(self.txtSimulatedFiatBalance.text()) < theConfig.CONFIG_SIMU_INITIAL_BALANCE_MIN) or (int(self.txtSimulatedFiatBalance.text()) > theConfig.CONFIG_SIMU_INITIAL_BALANCE_MAX)):
+            fiatBalance = float(self.txtSimulatedFiatBalance.text().replace(',','.'))
+            if ((fiatBalance < theConfig.CONFIG_SIMU_INITIAL_BALANCE_MIN) or (fiatBalance > theConfig.CONFIG_SIMU_INITIAL_BALANCE_MAX)):
                 print("UIST - Input range error on Simulated fiat balance to invest")
                 self.MessageBoxPopup("Error: Initial simulated fiat balance entry must be between " + str(theConfig.CONFIG_SIMU_INITIAL_BALANCE_MIN) + " to " + str(theConfig.CONFIG_SIMU_INITIAL_BALANCE_MAX), 0)
                 return False
@@ -438,7 +458,10 @@ class UISettings(QtGui.QWidget):
         self.comboTradingPair.addItem("BCH-USD")
         self.comboTradingPair.addItem("BCH-EUR")
         self.comboTradingPair.addItem("ETC-USD")
-        self.comboTradingPair.addItem("ETC-EUR")        
+        self.comboTradingPair.addItem("ETC-EUR")    
+        self.comboTradingPair.addItem("BCH-BTC")
+        self.comboTradingPair.addItem("ETH-BTC")
+        self.comboTradingPair.addItem("LTC-BTC")               
         self.comboTradingPair.currentIndexChanged.connect(self.EventComboTradingPairChanged)
         self.comboTradingPair.setStyleSheet(self.STR_COMBO_STYLESHEET)
         self.mainGridLayout2.addWidget(self.comboTradingPair, rowNumber, 1)
@@ -452,9 +475,9 @@ class UISettings(QtGui.QWidget):
         self.mainGridLayout2.addWidget(self.lblFiatPercentageToInvest, rowNumber, 0)
         self.hBoxFiatAmount = QtGui.QHBoxLayout()
         self.sliderFiatAmount = QtGui.QSlider(QtCore.Qt.Horizontal)
-        self.sliderFiatAmount.setMinimum(10)
-        self.sliderFiatAmount.setMaximum(95)
-        self.sliderFiatAmount.setValue(95)
+        self.sliderFiatAmount.setMinimum(1)
+        self.sliderFiatAmount.setMaximum(99)
+        self.sliderFiatAmount.setValue(50)
         self.sliderFiatAmount.setStyleSheet(self.STR_QSLIDER_STYLESHEET)
         self.sliderFiatAmount.valueChanged.connect(self.EventMovedSliderFiatAmountInvest)
         self.lblFiatAmountValue = QtGui.QLabel("90 %")
@@ -466,7 +489,7 @@ class UISettings(QtGui.QWidget):
         rowNumber = rowNumber + 1
     
         # Coinbase Pro Taker fee
-        self.lblTakerFee = QtGui.QLabel("Coinbase Pro Taker order fee:")
+        self.lblTakerFee = QtGui.QLabel("Coinbase Pro Taker and Maker order fee:")
         self.lblTakerFee.setStyleSheet(self.STR_QLABEL_STYLESHEET);
         self.lblTakerFee.setFixedHeight(30)
         self.lblTakerFee.setContentsMargins(20,0,0,0)
@@ -540,7 +563,7 @@ class UISettings(QtGui.QWidget):
         self.txtSimulatedFiatBalance = QtGui.QLineEdit()
         self.txtSimulatedFiatBalance.setStyleSheet(self.STR_QTEXTEDIT_STYLESHEET)
         self.txtSimulatedFiatBalance.setFixedWidth(80)
-        self.txtSimulatedFiatBalance.setValidator(QIntValidator())
+        self.txtSimulatedFiatBalance.setValidator(QDoubleValidator())
         self.lblSimulatedFiatBalance = QtGui.QLabel(self.theSettings.SETT_GetSettings()["strFiatType"])
         self.lblSimulatedFiatBalance.setStyleSheet(self.STR_QLABEL_STYLESHEET);
         self.lblSimulatedFiatBalance.setFixedWidth(self.RIGHT_LABELS_WIDTH_IN_PX)

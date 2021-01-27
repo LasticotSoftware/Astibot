@@ -37,7 +37,7 @@ class TransactionManager(object):
         self.buyTimeInTimeStamp = 0
         self.currentBuyInitialPriceInEUR = 0
 
-        self.theUIGraph.UIGR_updateAccountsBalance(round(self.FiatAccountBalance, 2), round(self.CryptoAccountBalance, 6))
+        self.theUIGraph.UIGR_updateAccountsBalance(round(self.FiatAccountBalance, 6), round(self.CryptoAccountBalance, 6))
         self.theUIGraph.UIGR_updateTotalProfit(self.realProfit, self.theoricalProfit, self.percentageProfit, False)
 
         threadOrderPlacing = threading.Timer(1, self.threadOrderPlacing)
@@ -76,7 +76,7 @@ class TransactionManager(object):
         # In simulation mode, simulate an amount of money on the account
         if (theConfig.CONFIG_INPUT_MODE_IS_REAL_MARKET == False):
             self.initialFiatAccountBalance = 0
-            self.FIATAccountBalanceSimulated = int(self.theSettings.SETT_GetSettings()["simulatedFiatBalance"])
+            self.FIATAccountBalanceSimulated = float(self.theSettings.SETT_GetSettings()["simulatedFiatBalance"])
             self.initialInvestedFiatAmount = float(self.theSettings.SETT_GetSettings()["investPercentage"]) * 0.01 * self.FIATAccountBalanceSimulated
             self.cryptoAccountBalanceSimulated = 0
             self.theUIGraph.UIGR_updateAccountsBalance(self.FIATAccountBalanceSimulated, self.cryptoAccountBalanceSimulated)
@@ -126,11 +126,11 @@ class TransactionManager(object):
     def TRNM_StartBuyOrSellAttempt(self, buyOrSell, MinMaxPrice):
         
         if (buyOrSell == "BUY"):
-            print("TRNM - Limit %s requested, max buy price is %s %s" % (buyOrSell, round(MinMaxPrice, 2), self.theSettings.SETT_GetSettings()["strFiatType"]))
-            self.theUIGraph.UIGR_updateInfoText("Placing %s order, max buy price is %s %s" % (buyOrSell, round(MinMaxPrice, 2), self.theSettings.SETT_GetSettings()["strFiatType"]), False)
+            print("TRNM - Limit %s requested, max buy price is %s %s" % (buyOrSell, round(MinMaxPrice, 5), self.theSettings.SETT_GetSettings()["strFiatType"]))
+            self.theUIGraph.UIGR_updateInfoText("Placing %s order, max buy price is %s %s" % (buyOrSell, round(MinMaxPrice, 5), self.theSettings.SETT_GetSettings()["strFiatType"]), False)
         elif (buyOrSell == "SELL"):
-            print("TRNM - Limit %s requested, min sell price is %s %s" % (buyOrSell, round(MinMaxPrice, 2), self.theSettings.SETT_GetSettings()["strFiatType"]))
-            self.theUIGraph.UIGR_updateInfoText("Placing %s order, min sell price is %s %s" % (buyOrSell, round(MinMaxPrice, 2), self.theSettings.SETT_GetSettings()["strFiatType"]), False)
+            print("TRNM - Limit %s requested, min sell price is %s %s" % (buyOrSell, round(MinMaxPrice, 5), self.theSettings.SETT_GetSettings()["strFiatType"]))
+            self.theUIGraph.UIGR_updateInfoText("Placing %s order, min sell price is %s %s" % (buyOrSell, round(MinMaxPrice, 5), self.theSettings.SETT_GetSettings()["strFiatType"]), False)
         else:
             print("TRNM - Limit %s requested, unknown order type" % buyOrSell)
         
@@ -240,7 +240,7 @@ class TransactionManager(object):
                         # Simulation: Compute new simulated balances
                         self.FIATAccountBalanceSimulated = self.FIATAccountBalanceSimulated - (self.FIATAccountBalanceSimulated * ratioOfCryptoCapabilityToBuy)
                         self.cryptoAccountBalanceSimulated = self.currentBuyAmountInCryptoWithFee
-                        self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 2), round(self.cryptoAccountBalanceSimulated, 4))
+                        self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 5), round(self.cryptoAccountBalanceSimulated, 5))
                         bOrderIsSuccessful = True
                 
                 # Update display  ============================================================================
@@ -297,7 +297,7 @@ class TransactionManager(object):
                     #                                    FIAT balance already present      sell value (with GDAX fee) -> money that goes back into fiat
                     self.FIATAccountBalanceSimulated = self.FIATAccountBalanceSimulated + sellPriceWithFeeInFiat
                     self.cryptoAccountBalanceSimulated = 0
-                    self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 2), round(self.cryptoAccountBalanceSimulated, 4))
+                    self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 5), round(self.cryptoAccountBalanceSimulated, 5))
                     bOrderIsSuccessful = True
 
                 # Update display
@@ -383,10 +383,10 @@ class TransactionManager(object):
                 print("TRNM - RefreshAccountBalancesAndProfit : currentBuyAmountInCryptoWithoutFee greater than quantum: don't update profit. currentBuyAmountInCryptoWithoutFee is %s" % self.currentBuyAmountInCryptoWithoutFee)
                 
             self.CryptoAccountBalance = self.theGDAXControler.GDAX_GetCryptoAccountBalance()
-            self.theUIGraph.UIGR_updateTotalProfit(round(self.realProfit, 2), round(self.theoricalProfit, 2), round(self.percentageProfit, 1), False)
+            self.theUIGraph.UIGR_updateTotalProfit(round(self.realProfit, 7), round(self.theoricalProfit, 7), round(self.percentageProfit, 1), False)
         else:
             self.percentageProfit = ((self.theoricalProfit + self.initialInvestedFiatAmount) / (self.initialInvestedFiatAmount) - 1) * 100
-            self.theUIGraph.UIGR_updateTotalProfit(0, round(self.theoricalProfit, 2), round(self.percentageProfit, 1), True)
+            self.theUIGraph.UIGR_updateTotalProfit(0, round(self.theoricalProfit, 7), round(self.percentageProfit, 1), True)
             if (self.pendingNotificationToSend != ""):
                 theNotifier.SendWhatsappMessage(self.pendingNotificationToSend + "\n*Total profit: %s %%*" % round(self.percentageProfit, 1) )
 
@@ -410,6 +410,7 @@ class TransactionManager(object):
                         print("TRNM - GetOngoingLimitOrderState: Simulated price : %s above sellTrigger, simulate sell order filled" % self.theMarketData.MRKT_GetLastRefPrice())
                         self.averageSellPriceInFiat = self.theMarketData.MRKT_GetLastRefPrice()
                         self.SimulateSellOrderFilled()
+
                         return "FILLED"
                     else:
                         return "ONGOING" 
@@ -420,14 +421,14 @@ class TransactionManager(object):
                     # MACD-based sell trigger
                     return "FILLED" 
             else:
-                print("TRNM - GetOngoingLimitOrderState: Unknown orderPlacingType. Filled returned.")                 
-                return "FILLED"
+                print("TRNM - GetOngoingLimitOrderState: Unknown orderPlacingType. NONE returned.")                 
+                return "NONE"
         else: # Real market        
             self.threadOrderPlacingLock.acquire()
             currentState = self.orderPlacingState
             
             if (currentState == "FILLED"):
-                self.currentOrderState = "NONE"
+                self.orderPlacingState = "NONE"
             
             self.threadOrderPlacingLock.release()
             
@@ -475,7 +476,7 @@ class TransactionManager(object):
                             elif (self.orderPlacingType == "SELL"):
                                 self.currentSoldAmountInCryptoViaLimitOrder = self.theGDAXControler.GDAX_GetAveragePriceInFiatAndSizeFilledInCrypto()[1]
                                 self.averageSellPriceInFiat = self.theGDAXControler.GDAX_GetAveragePriceInFiatAndSizeFilledInCrypto()[0]
-                                profitEstimationInFiat = self.computeProfitEstimation(False, self.currentSoldAmountInCryptoViaLimitOrder)[0]
+                                profitEstimationInFiat = self.computeProfitEstimation(True, self.currentSoldAmountInCryptoViaLimitOrder)[0]
                                 self.isOrderPlacingActive = False # Set to false before display
                                 self.performSellDisplayActions(True, False, liveBestAskPrice, profitEstimationInFiat)
                                 # Total profit computation
@@ -505,7 +506,7 @@ class TransactionManager(object):
                                     # If there's been a new match since last iteration
                                     self.currentSoldAmountInCryptoViaLimitOrder = self.theGDAXControler.GDAX_GetAveragePriceInFiatAndSizeFilledInCrypto()[1]
                                     self.averageSellPriceInFiat = self.theGDAXControler.GDAX_GetAveragePriceInFiatAndSizeFilledInCrypto()[0]
-                                    profitEstimationInFiat = self.computeProfitEstimation(False, self.currentSoldAmountInCryptoViaLimitOrder)[0]
+                                    profitEstimationInFiat = self.computeProfitEstimation(True, self.currentSoldAmountInCryptoViaLimitOrder)[0]
                                     self.performSellDisplayActions(True, False, liveBestAskPrice, profitEstimationInFiat)
                                     self.orderPlacingState = 'MATCHED'
                                 else:
@@ -561,7 +562,7 @@ class TransactionManager(object):
                                     statusIsOk = self.theGDAXControler.GDAX_PlaceLimitBuyOrder(buyCapabilityInCrypto * ratioOfCryptoCapabilityToBuy, self.orderPlacingCurrentPriceInFiat)
                                 elif (self.currentBuyInitialPriceInEUR == 0): # Order book buy price too high: cancel order only if it has not matched
                                     print("TRNM - threadOrderPlacing: live best bid price too high: cancel order")
-                                    self.GDAX_CancelOngoingLimitOrder()
+                                    self.theGDAXControler.GDAX_CancelOngoingLimitOrder()
                                     # live best bid too high: cancel order
                                     self.isOrderPlacingActive = False
                                     self.orderPlacingCurrentPriceInFiat = 0
@@ -595,7 +596,7 @@ class TransactionManager(object):
 
             time.sleep(0.03)
 
-    # ATTENTION: thread safe avec UIGR ?
+    # /!\ TODO Check if UIGR calls are thread safe
     def performBuyDisplayActions(self, isLimitOrder):
                 
         if (isLimitOrder):
@@ -605,19 +606,19 @@ class TransactionManager(object):
                     sellThreshold = self.currentBuyInitialPriceInEUR * ((sellTriggerInPercent/100)+1) 
                 else:
                     sellThreshold = self.currentBuyInitialPriceInEUR * (theConfig.CONFIG_MIN_PRICE_ELEVATION_RATIO_TO_SELL + 2*self.platformTakerFeeInPercent) # Not the official one : for display only. Trader class manages this actual feature.
-                self.theUIGraph.UIGR_updateInfoText("%s %s Bought @ %s %s via limit order - Waiting for a sell opportunity above %s %s" % (round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 2), self.theSettings.SETT_GetSettings()["strFiatType"]), False)            
-                theNotifier.SendWhatsappMessage("*BUY filled* %s %s @ %s %s via limit order - Waiting for a sell opportunity above %s %s" % (round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 2), self.theSettings.SETT_GetSettings()["strFiatType"]))
+                self.theUIGraph.UIGR_updateInfoText("%s %s Bought @ %s %s via limit order - Waiting for a sell opportunity above %s %s" % (round(self.currentBuyAmountInCryptoWithoutFee, 5), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 5), self.theSettings.SETT_GetSettings()["strFiatType"]), False)            
+                theNotifier.SendWhatsappMessage("*BUY filled* %s %s @ %s %s via limit order - Waiting for a sell opportunity above %s %s" % (round(self.currentBuyAmountInCryptoWithoutFee, 5), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 5), self.theSettings.SETT_GetSettings()["strFiatType"]))
                 
                 # Order is totally filled, add marker
                 self.theUIGraph.UIGR_addMarker(1)  
             else:
-                self.theUIGraph.UIGR_updateInfoText("%s %s Partially bought @ %s %s. Still ongoing, waiting for next matches" % (round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"]), False)            
-                theNotifier.SendWhatsappMessage("*BUY match* %s %s @ %s %s. Still ongoing, waiting for next matches" % (round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"]))                  
+                self.theUIGraph.UIGR_updateInfoText("%s %s Partially bought @ %s %s. Still ongoing, waiting for next matches" % (round(self.currentBuyAmountInCryptoWithoutFee, 5), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 5), self.theSettings.SETT_GetSettings()["strFiatType"]), False)            
+                theNotifier.SendWhatsappMessage("*BUY match* %s %s @ %s %s. Still ongoing, waiting for next matches" % (round(self.currentBuyAmountInCryptoWithoutFee, 5), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 5), self.theSettings.SETT_GetSettings()["strFiatType"]))                  
         else:
             buyTimeStr = datetime.fromtimestamp(int(self.buyTimeInTimeStamp)).strftime('%H:%M')
             sellThreshold = self.currentBuyInitialPriceInEUR * (theConfig.CONFIG_MIN_PRICE_ELEVATION_RATIO_TO_SELL + 2*self.platformTakerFeeInPercent) # Not the official one : for display only. Trader class manages this actual feature.
-            self.theUIGraph.UIGR_updateInfoText("%s - %s %s Bought @ %s %s - Waiting for a sell opportunity above %s %s" % (buyTimeStr, round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 2), self.theSettings.SETT_GetSettings()["strCryptoType"]), False)            
-            theNotifier.SendWhatsappMessage("*BUY* %s %s @ %s %s - Waiting for a sell opportunity above %s %s" % (round(self.currentBuyAmountInCryptoWithoutFee, 3), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 2), self.theSettings.SETT_GetSettings()["strFiatType"]))
+            self.theUIGraph.UIGR_updateInfoText("%s - %s %s Bought @ %s %s - Waiting for a sell opportunity above %s %s" % (buyTimeStr, round(self.currentBuyAmountInCryptoWithoutFee, 5), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 5), self.theSettings.SETT_GetSettings()["strCryptoType"]), False)            
+            theNotifier.SendWhatsappMessage("*BUY* %s %s @ %s %s - Waiting for a sell opportunity above %s %s" % (round(self.currentBuyAmountInCryptoWithoutFee, 5), self.theSettings.SETT_GetSettings()["strCryptoType"], round(self.currentBuyInitialPriceInEUR, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(sellThreshold, 5), self.theSettings.SETT_GetSettings()["strFiatType"]))
         
             self.theUIGraph.UIGR_addMarker(1)
         
@@ -627,20 +628,20 @@ class TransactionManager(object):
         
         if (isLimitOrder):
             if (self.isOrderPlacingActive == False): # Order is totally filled
-                self.theUIGraph.UIGR_updateInfoText("SELL filled at %s, profit was about %s EUR. Waiting for next buy opportunity" % (sellTimeStr, round(profitEstimationInFiat, 2)), False)
-                self.pendingNotificationToSend = ("*SELL filled* at %s %s, profit was about *%s EUR*. " % (round(sellPriceInFiat, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 2)))
+                self.theUIGraph.UIGR_updateInfoText("SELL filled at %s, profit was about %s EUR. Waiting for next buy opportunity" % (sellTimeStr, round(profitEstimationInFiat, 5)), False)
+                self.pendingNotificationToSend = ("*SELL filled* at %s %s, profit was about *%s EUR*. " % (round(sellPriceInFiat, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 5)))
                 # Order is totally filled, add marker
                 self.theUIGraph.UIGR_addMarker(2)
             else:                
-                self.theUIGraph.UIGR_updateInfoText("Partial sell at %s, profit was about %s EUR. Still ongoing, waiting for next matches" % (sellTimeStr, round(profitEstimationInFiat, 2)), False)
-                self.pendingNotificationToSend = ("*SELL match* at %s %s, profit was about *%s EUR*. " % (round(sellPriceInFiat, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 2)))
+                self.theUIGraph.UIGR_updateInfoText("Partial sell at %s, profit was about %s EUR. Still ongoing, waiting for next matches" % (sellTimeStr, round(profitEstimationInFiat, 5)), False)
+                self.pendingNotificationToSend = ("*SELL match* at %s %s, profit was about *%s EUR*. " % (round(sellPriceInFiat, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 5)))
         else:
             if (isStopLossSell == False):
-                self.theUIGraph.UIGR_updateInfoText("Last sell at %s, profit was about %s EUR. Waiting for next buy opportunity" % (sellTimeStr, round(profitEstimationInFiat, 2)), False)
-                self.pendingNotificationToSend = ("*SELL* at %s %s, profit was about *%s EUR*. " % (round(sellPriceInFiat, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 2)))
+                self.theUIGraph.UIGR_updateInfoText("Last sell at %s, profit was about %s EUR. Waiting for next buy opportunity" % (sellTimeStr, round(profitEstimationInFiat, 5)), False)
+                self.pendingNotificationToSend = ("*SELL* at %s %s, profit was about *%s EUR*. " % (round(sellPriceInFiat, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 5)))
             else:
-                self.theUIGraph.UIGR_updateInfoText("StopLoss-sell at %s, loss was about %s EUR. Waiting for next buy opportunity" % (sellTimeStr, round(profitEstimationInFiat, 2)), True)
-                self.pendingNotificationToSend = ("*STOPLOSS-SELL* at %s %s, loss was about *%s EUR*. " % (round(sellPriceInFiat, 2), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 2)))
+                self.theUIGraph.UIGR_updateInfoText("StopLoss-sell at %s, loss was about %s EUR. Waiting for next buy opportunity" % (sellTimeStr, round(profitEstimationInFiat, 5)), True)
+                self.pendingNotificationToSend = ("*STOPLOSS-SELL* at %s %s, loss was about *%s EUR*. " % (round(sellPriceInFiat, 5), self.theSettings.SETT_GetSettings()["strFiatType"], round(profitEstimationInFiat, 5)))
             
             # Add marker
             self.theUIGraph.UIGR_addMarker(2)
@@ -660,7 +661,10 @@ class TransactionManager(object):
         # Simulated market: simulate new balances
         self.FIATAccountBalanceSimulated = self.FIATAccountBalanceSimulated - (self.currentBuyInitialPriceInEUR * self.currentBuyAmountInCryptoWithoutFee)
         self.cryptoAccountBalanceSimulated = self.currentBuyAmountInCryptoWithoutFee
-        self.UIGR_update_accounts_balance = self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 2), round(self.cryptoAccountBalanceSimulated, 4))
+        self.UIGR_update_accounts_balance = self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 5), round(self.cryptoAccountBalanceSimulated, 5))
+        
+        # Reset simulated buy order data
+        self.orderPlacingType = "NONE"
         
         # Update display  =================================================================================
         self.buyTimeInTimeStamp = time.time()
@@ -671,13 +675,13 @@ class TransactionManager(object):
     def SimulateSellOrderFilled(self):
         print("TRNM - Simulated limit Sell Now")
                 
-        [profitEstimationInFiat, sellPriceWithFeeInFiat] = self.computeProfitEstimation(False, self.currentBuyAmountInCryptoWithoutFee)
+        [profitEstimationInFiat, sellPriceWithFeeInFiat] = self.computeProfitEstimation(True, self.currentBuyAmountInCryptoWithFee)
 
         # Simulate the sell amount of money going back to the FIAT account =======================
             #                                    FIAT balance already present      sell value (with GDAX fee) -> money that goes back into fiat
         self.FIATAccountBalanceSimulated = self.FIATAccountBalanceSimulated + sellPriceWithFeeInFiat
         self.cryptoAccountBalanceSimulated = 0
-        self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 2), round(self.cryptoAccountBalanceSimulated, 4))
+        self.theUIGraph.UIGR_updateAccountsBalance(round(self.FIATAccountBalanceSimulated, 5), round(self.cryptoAccountBalanceSimulated, 5))
         bOrderIsSuccessful = True
 
         print("TRNM - Simulated limit Sell performed: sellAmountInFiat=%s, profit estimation in fiat=%s" % (sellPriceWithFeeInFiat, profitEstimationInFiat))
@@ -687,3 +691,14 @@ class TransactionManager(object):
         
         self.theoricalProfit = self.theoricalProfit + profitEstimationInFiat
         self.TRNM_RefreshAccountBalancesAndProfit()
+        
+        # Reset simulated sell order data
+        self.orderPlacingType = "NONE"
+        
+        # Reset buy data
+        self.currentBuyAmountInCryptoWithoutFee = 0
+        self.currentBuyAmountInCryptoWithFee = 0
+        self.currentSoldAmountInCryptoViaLimitOrder = 0
+        self.averageSellPriceInFiat = 0
+        self.currentBuyInitialPriceInEUR = 0
+        self.buyTimeInTimeStamp = 0                

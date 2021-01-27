@@ -820,7 +820,7 @@ class UIGraph():
         if (self.displayProfitAsInSimulation == True):
             self.lblTotalGains.setText(self.STR_LABEL_TOTAL_GAINS + str(self.theoricProfit) + " " + str(self.theSettings.SETT_GetSettings()["strFiatType"]) + " (" + str(self.percentageProfit) + "%) (Simulation)")
         else:
-            self.lblTotalGains.setText(self.STR_LABEL_TOTAL_GAINS + str(self.realProfit) + " " + str(self.theSettings.SETT_GetSettings()["strFiatType"]) + " (Theoric: " + str(self.theoricProfit) + " " + str(self.theSettings.SETT_GetSettings()["strFiatType"]) + ")"  + " " + str(self.theSettings.SETT_GetSettings()["strFiatType"]) + ")" + " (" + str(self.percentageProfit) + "%)")
+            self.lblTotalGains.setText(self.STR_LABEL_TOTAL_GAINS + str(self.realProfit) + " " + str(self.theSettings.SETT_GetSettings()["strFiatType"]) + " (Theoric: " + str(self.theoricProfit) + " " + str(self.theSettings.SETT_GetSettings()["strFiatType"]) + ")"  + " (" + str(self.percentageProfit) + "%)")
          
         if (self.theoricProfit > 0):
             self.lblTotalGains.setStyleSheet(self.STR_QLABEL_PROFIT_GREEN_STYLESHEET)

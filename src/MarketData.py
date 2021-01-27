@@ -162,15 +162,11 @@ class MarketData():
         
         # Update price on the UI
         if (self.totalNbIterations % self.UIGraphSubScheduling == 0):            
-            self.theUIGraph.UIGR_updatePriceLbl(round(self.dataRefCryptoPriceInEUR[-1], 2))
+            self.theUIGraph.UIGR_updatePriceLbl(round(self.dataRefCryptoPriceInEUR[-1], 5))
 
     def updateFastSmoothAverage(self):
         if (self.totalNbIterations > self.NB_POINTS_FOR_FAST_SMOOTH_FILTER + 1):
             if (self.totalNbIterations % self.UIGraphSubScheduling == 0):
-                #WnFast=1/55       # Filtre à 12 fois plus lent
-                #N=1 # Ordre du filtre
-                #b, a = signal.butter(N, Wn, 'low') # One gotcha is that Wn is a fraction of the Nyquist frequency (half the sampling frequency). 
-                # So if the sampling rate is 1000Hz and you want a cutoff of 250Hz, you should use Wn=0.5.
                 self.dataRefSmoothAverageFast.append((signal.lfilter(self.bFast, self.aFast, self.dataRefCryptoPriceInEUR[-self.NB_POINTS_FOR_FAST_SMOOTH_FILTER:]))[-1])       
         else:
             self.dataRefSmoothAverageFast.append(self.dataRefCryptoPriceInEUR[-1]*0.999)
