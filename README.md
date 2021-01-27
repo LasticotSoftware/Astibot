@@ -15,7 +15,7 @@ Astibot bases its decisions on 2 real-time indicators:
 * Live trading mode (real-time trading)
 * Simulation mode (to backtest the settings)
 * Customizable MACD-like decision indicator (to detect buy and sell opportunities)
-* Supported Coinbase pro trading pairs: BTC-USD, BTC-EUR, ETH-USD, ETH-EUR, LTC-USD, LTC-EUR, BCH-USD, BCH-EUR, ETC-USD, ETC-EUR (new pairs are easy to add)
+* Supported Coinbase pro trading pairs: BTC-USD, BTC-EUR, ETH-USD, ETH-EUR, LTC-USD, LTC-EUR, BCH-USD, BCH-EUR, ETC-USD, ETC-EUR, ETH-BTC, BCH-BTC, LTC-BTC
 
 ## Advanced features
 * Risk line: a customizable, real-time updated limit price limit above which Astibot will never buy
@@ -58,9 +58,12 @@ To understand the general software breakdown, a diagram is worth thousand words.
 ![Alt text](/doc/astibot_architecture.png?raw=true "Astibot software architecture")
 
 ## Known limitations
-* In the current version, limit orders are considered to be free: that is not the case anymore since Coinbase Pro increased all their fees. Astibot needs to be updated to take this in consideration for the profit computation and trading strategy.
-* Astibot only implements the Coinbase Pro interface. It would not be that hard to create a "BinanceControler", "BitfinexControler" ... to add multiplatform support. These specific controlers could herit from a more generic and abstrct controler seen from higher level modules (polymorphism).
-* Some modules are too big and could be splitted into more micro modules (UIGraph for example).
 
+* Astibot is designed to prioritize the execution of limit orders over market orders. However limit orders placing, monitoring and replacing on top of the order book in real-time when a buy/sell signal is raised is tricky to implement and I don't think it works perfectly. To avoid problems with this limit order mode feature, I configured Astibot to use market orders only by default (see TradingBotConfig file).
+* Astibot only implements the Coinbase Pro API . It would not be that hard to create a "BinanceControler", "BitfinexControler" ... to add multiplatform support. These specific controlers could herit from a more generic and abstract controler seen from higher level modules (polymorphism).
 
+## Development and design improvements
+
+* Some modules are too big and could be splitted into more micro modules (UIGraph for example)
+* Astibot was originally designed to trade fiat-crypto pairs. Recently, I added the support for BTC based pairs but I didn't have time to rename all the variable labelled "fiatXXX" that were orginally are designed to contain data about the fiat currency. So for example, variables fiatAccountBalance and cryptoAccountBalance should have more generic names like account1Balance, account2Balance.
 
