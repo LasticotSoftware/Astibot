@@ -19,7 +19,7 @@ class Settings(object):
                     "strFiatType": "EUR",
                     "strCryptoType": "BTC",
                     "investPercentage": 90,
-                    "platformTakerFee": 0.3,
+                    "platformTakerFee": 0.5,
                     "sellTrigger" : 0.0,
                     "autoSellThreshold": 0.0,
                     "simulatedFiatBalance": 1000,

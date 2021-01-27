@@ -42,7 +42,7 @@ class UISettings(QtGui.QWidget):
         self.setStyleSheet("background-color:#203044;")
         self.setWindowIcon(QtGui.QIcon("AstibotIcon.png"))
         self.setAutoFillBackground(True);
-        self.setFixedSize(646, 610)
+        self.setFixedSize(646, 660)
         
         # Build layout
         self.BuildWindowLayout()
@@ -511,7 +511,7 @@ class UISettings(QtGui.QWidget):
         rowNumber = rowNumber + 1
         
         # Sell trigger
-        self.lblSellTrigger = QtGui.QLabel("Sell trigger (% profit):")
+        self.lblSellTrigger = QtGui.QLabel("Auto-Sell trigger (% above buy price, set 0 to disable):")
         self.lblSellTrigger.setStyleSheet(self.STR_QLABEL_STYLESHEET);
         self.lblSellTrigger.setFixedHeight(30)
         self.lblSellTrigger.setContentsMargins(20,0,0,0)
@@ -533,7 +533,7 @@ class UISettings(QtGui.QWidget):
         rowNumber = rowNumber + 1
         
         # Auto-sell by percentage threshold
-        self.lblAutoSellThreshold = QtGui.QLabel("Percentage decrease at which trigger auto-sell:")
+        self.lblAutoSellThreshold = QtGui.QLabel("Stop-loss trigger (% below buy price, set 0 to disable):")
         self.lblAutoSellThreshold.setStyleSheet(self.STR_QLABEL_STYLESHEET);
         self.lblAutoSellThreshold.setFixedHeight(30)
         self.lblAutoSellThreshold.setContentsMargins(20,0,0,0)
