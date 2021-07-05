@@ -26,8 +26,8 @@ class GDAXCurrencies:
             pieces = pair.split('-')
             map.append({
                 "full": pair,
-                "coin": pieces[1],
-                "fiat": pieces[0]
+                "coin": pieces[0],
+                "fiat": pieces[1]
             })
 
         return map
