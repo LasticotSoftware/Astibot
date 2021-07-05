@@ -79,7 +79,7 @@ class UIGraph():
     STR_QLABEL_INFO_GREEN_STYLESHEET = "QLabel { background-color : #203044; color : #29CF36; font: bold 14px; text-decoration: underline;}"
     STR_QLABEL_INFO_ORANGE_STYLESHEET = "QLabel { background-color : #203044; color : #FF8000; font: bold 14px; text-decoration: underline;}"
     STR_QLABEL_TOOLTIP_STYLESHEET = "QLabel { background-color : #151f2b; color : white; font: 10px;}"
-    STR_QLABEL_CONNEXION_STATUS_STYLESHEET = "QLabel { background-color : #151f2b; color : green; font: 10px;}"
+    STR_QLABEL_CONNECTION_STATUS_STYLESHEET = "QLabel { background-color : #151f2b; color : green; font: 10px;}"
     STR_QLABEL_VERSION_STYLESHEET = "QLabel { background-color : #151f2b; color : #334c6b; font: 11px;}"
     STR_QLABEL_LIVE_DATA_STYLESHEET = "QLabel { background-color : #151f2b; color : #334c6b; font: 10px;}"
     STR_QRADIOBUTTON_STYLESHEET = "QRadioButton { background-color : #203044; color : white; font: 14px;} QRadioButton::indicator:checked {background-color: #007ad9; border: 1px solid white;} QRadioButton::indicator:unchecked {background-color: #203044; border: 1px solid white;}"
@@ -376,19 +376,19 @@ class UIGraph():
         self.rootHboxBottom = QtGui.QHBoxLayout()
         self.rootHboxBottom.setContentsMargins(40, 0, 40, 0) # left, top, right, bottom
         self.rootVboxBottomRight = QtGui.QVBoxLayout()
-        self.lblConnexion = QtGui.QLabel("")
-        self.lblConnexion.setAlignment(QtCore.Qt.AlignRight)
+        self.lblConnection = QtGui.QLabel("")
+        self.lblConnection.setAlignment(QtCore.Qt.AlignRight)
         self.lblToolTip.setStyleSheet(self.STR_QLABEL_TOOLTIP_STYLESHEET);
         self.lblToolTip.setWordWrap(True);
         self.lblToolTip.setFixedWidth((self.MAIN_WINDOW_WIDTH_IN_PX / 2))
         self.lblToolTip.setFixedHeight(42)
-        self.lblConnexion.setStyleSheet(self.STR_QLABEL_CONNEXION_STATUS_STYLESHEET);
+        self.lblConnection.setStyleSheet(self.STR_QLABEL_CONNECTION_STATUS_STYLESHEET);
         self.lblLiveData = QtGui.QLabel("")
         self.lblLiveData.setStyleSheet(self.STR_QLABEL_LIVE_DATA_STYLESHEET);
         self.lblLiveData.setAlignment(QtCore.Qt.AlignRight)
-        self.lblConnexion.setAlignment(QtCore.Qt.AlignRight)
+        self.lblConnection.setAlignment(QtCore.Qt.AlignRight)
         self.rootHboxBottom.addWidget(self.lblToolTip, QtCore.Qt.AlignLeft)
-        self.rootVboxBottomRight.addWidget(self.lblConnexion)
+        self.rootVboxBottomRight.addWidget(self.lblConnection)
         self.rootVboxBottomRight.addWidget(self.lblLiveData)     
         self.rootHboxBottom.addLayout(self.rootVboxBottomRight, QtCore.Qt.AlignRight)
         self.rootBottomBlock.setLayout(self.rootHboxBottom)
@@ -875,12 +875,12 @@ class UIGraph():
             else:
                 self.lblCurrentState.setVisible(False)
     
-    def UIGR_resetConnexionText(self):
-        self.lblConnexion.setText("")
+    def UIGR_resetConnectionText(self):
+        self.lblConnection.setText("")
           
-    def UIGR_updateConnexionText(self, newText):
-        if (self.lblConnexion.text() == ""):
-            self.lblConnexion.setText(newText)
+    def UIGR_updateConnectionText(self, newText):
+        if (self.lblConnection.text() == ""):
+            self.lblConnection.setText(newText)
 
     def UIGR_updateLiveData(self, newData):
         self.strLiveData = (str(newData)[:100])

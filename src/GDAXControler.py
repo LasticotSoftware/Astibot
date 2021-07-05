@@ -9,6 +9,7 @@ from datetime import datetime
 import pytz
 from tzlocal import get_localzone
 from requests.exceptions import ConnectionError
+from GDAXCurrencies import GDAXCurrencies
 import math # truncate
 
 # This module is actually a Coinbae Pro handler
@@ -23,8 +24,9 @@ class GDAXControler(cbpro.OrderBook):
     
 
     def __init__(self, UIGraph, Settings):
-        
-        super(GDAXControler, self).__init__(product_id='BTC-USD', log_to=False)
+
+        first_currency = GDAXCurrencies.get_all_pairs()[0]
+        super(GDAXControler, self).__init__(product_id=first_currency, log_to=False)
         
         self.theUIGraph = UIGraph
         # Application settings data instance
@@ -74,10 +76,10 @@ class GDAXControler(cbpro.OrderBook):
         return self.IsConnectedAndOperational
     
     # Fonction asynchrone
-    def GDAX_InitializeGDAXConnexion(self):
+    def GDAX_InitializeGDAXConnection(self):
         self.theUIGraph.UIGR_updateInfoText("Trying to connect...", False)
         self.IsConnectedAndOperational = "Requested"
-        print("GDAX - Connexion requested")
+        print("GDAX - Connection requested")
         
         if (self.webSocketIsOpened == True):
             print("GDAX - Closing Websocket...")
@@ -98,10 +100,10 @@ class GDAXControler(cbpro.OrderBook):
         self.products = [self.productStr]
         self.start()
                     
-    def PerformConnexionInitializationAttempt(self):
-        print("GDAX - Performing connexion initialization attempt...")
+    def PerformConnectionInitializationAttempt(self):
+        print("GDAX - Performing connection initialization attempt...")
         
-        bGDAXConnexionIsOK = True
+        bGDAXConnectionIsOK = True
         bInternetLinkIsOK = True
         self.bFiatAccountExists = False
         self.bCryptoAccountExists = False
@@ -116,9 +118,9 @@ class GDAXControler(cbpro.OrderBook):
         try:
             self.clientAuth = cbpro.AuthenticatedClient(self.api_key, self.api_secret, self.api_passphrase, api_url="https://api.pro.coinbase.com")
         except ConnectionError as e:
-           print("GDAX - Internet connexion error")        
+           print("GDAX - Internet connection error")
         except BaseException as e:
-            bGDAXConnexionIsOK = False
+            bGDAXConnectionIsOK = False
             bInternetLinkIsOK = False
             print("GDAX - Authentication error")
             print("GDAX - Exception : " + str(e))            
@@ -131,21 +133,21 @@ class GDAXControler(cbpro.OrderBook):
             if ('id' in self.accounts[0]):
                 print("GDAX - Successful accounts retrieving")
             else:
-                bGDAXConnexionIsOK = False
+                bGDAXConnectionIsOK = False
                 print("GDAX - Accounts retrieving not successful: no relevant data")
         except ConnectionError as e:
-           print("GDAX - Internet connexion error")
-           bGDAXConnexionIsOK = False
+           print("GDAX - Internet connection error")
+           bGDAXConnectionIsOK = False
            bInternetLinkIsOK = False
         except BaseException as e:
-            bGDAXConnexionIsOK = False
+            bGDAXConnectionIsOK = False
             print("GDAX - Authentication error: not possible to get accounts data")
             print("GDAX - Exception : " + str(e))
             print("GDAX - clientAuth is: %s" % str(self.clientAuth))
         
-        # If all steps before were successful, GDAX connexion is working
+        # If all steps before were successful, GDAX connection is working
         if (bInternetLinkIsOK == True):
-            if (bGDAXConnexionIsOK == True):
+            if (bGDAXConnectionIsOK == True):
                 # Check existence of right accounts
                 for currentAccount in self.accounts:
                     if currentAccount['currency'] == self.productCryptoStr:
@@ -159,7 +161,7 @@ class GDAXControler(cbpro.OrderBook):
                 
                 # If both accounts corresponding to the trading pair exist, init is successful
                 if ((self.bFiatAccountExists == True) and (self.bCryptoAccountExists == True)):
-                    print("GDAX - Initialization of GDAX connexion successful")
+                    print("GDAX - Initialization of GDAX connection successful")
                     
                     # Start Websocket feed
                     self.startWebSocketFeed()
@@ -177,9 +179,9 @@ class GDAXControler(cbpro.OrderBook):
                 
                 self.refreshAccounts()
             else:
-                print("GDAX - Initialization of GDAX connexion failed")
+                print("GDAX - Initialization of GDAX connection failed")
                 self.IsConnectedAndOperational = "False"
-                # If first connexion, display explanation message
+                # If first connection, display explanation message
                 if (self.theSettings.SETT_IsSettingsFilePresent() == False):
                     # Else, display error message
                     self.theUIGraph.UIGR_updateInfoText("Welcome on Astibot! Your Coinbase Pro API keys are required for trading. Click here to set it up", False) 
@@ -187,10 +189,10 @@ class GDAXControler(cbpro.OrderBook):
                     # Else, display error message
                     self.theUIGraph.UIGR_updateInfoText("Coinbase Pro Authentication error: check your API credentials", True)        
         else:
-            print("GDAX - Initialization of GDAX connexion failed")
+            print("GDAX - Initialization of GDAX connection failed")
             self.IsConnectedAndOperational = "False"
             # Display error message
-            self.theUIGraph.UIGR_updateInfoText("Connexion to Coinbase Pro server failed. Check your internet connexion.", True) 
+            self.theUIGraph.UIGR_updateInfoText("Connection to Coinbase Pro server failed. Check your internet connection.", True)
                
     def GDAX_NotifyThatTradingPairHasChanged(self):
         self.productStr = self.theSettings.SETT_GetSettings()["strTradingPair"]
@@ -299,9 +301,9 @@ class GDAXControler(cbpro.OrderBook):
         else:
             pass # TRNM takes care of the price update
     
-    # WebSocket callback - On connexion opening
+    # WebSocket callback - On connection opening
     def on_open(self):
-        print("GDAX - WebSocket connexion opened (callback) on %s" % self.productStr)
+        print("GDAX - WebSocket connection opened (callback) on %s" % self.productStr)
         #self.url = "wss://ws-feed.pro.coinbase.com/"
         self.products = [self.productStr]
         self.webSocketIsOpened = True   
@@ -362,11 +364,11 @@ class GDAXControler(cbpro.OrderBook):
         
             
     def on_close(self):
-        print("GDAX - WebSocket connexion closed (callback)") 
+        print("GDAX - WebSocket connection closed (callback)")
         self.webSocketIsOpened = False
         
         if (self.isRunning == True): # If we are not exiting app
-            if (self.IsConnectedAndOperational != "Requested" and self.IsConnectedAndOperational != "Ongoing"): # If we are not re-initializing connexion (like settings apply)
+            if (self.IsConnectedAndOperational != "Requested" and self.IsConnectedAndOperational != "Ongoing"): # If we are not re-initializing connection (like settings apply)
                 print("GDAX - Unexpected close of websocket. Trying to restart.") 
                 while (self.isRunning == True and self.webSocketIsOpened == False):
                     print("GDAX - Restarting Websocket in 10 seconds...") 
@@ -395,7 +397,7 @@ class GDAXControler(cbpro.OrderBook):
             # Attempt a GDAX Initialization if requested
             if (self.IsConnectedAndOperational == "Requested"):
                 self.IsConnectedAndOperational = "Ongoing"
-                self.PerformConnexionInitializationAttempt()
+                self.PerformConnectionInitializationAttempt()
                 time.sleep(1) # Don't poll GDAX API too much
             
             self.backgroundOperationsCounter = self.backgroundOperationsCounter  + 1
@@ -416,7 +418,7 @@ class GDAXControler(cbpro.OrderBook):
                 self.PriceSpread = self.tickBestBidPrice - self.tickBestAskPrice
                 #print("GDAX - MiddleMarket price: %s" % self.tickBestBidPrice) 
  
-                self.theUIGraph.UIGR_updateConnexionText("Price data received from Coinbase Pro server")
+                self.theUIGraph.UIGR_updateConnectionText("Price data received from Coinbase Pro server")
             
                 # Refresh account balances
                 # Only do it if GDAX controler is OK in authenticated mode
@@ -438,7 +440,7 @@ class GDAXControler(cbpro.OrderBook):
                 if (self.requestAccountsBalanceUpdate == False):
                     time.sleep(0.1)
                     
-            self.theUIGraph.UIGR_resetConnexionText()
+            self.theUIGraph.UIGR_resetConnectionText()
             
             for x in range(0, 15):
                 if (self.requestAccountsBalanceUpdate == False):

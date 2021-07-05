@@ -71,7 +71,7 @@ class AppState(object):
         self.theUIGraph.UIGR_SetSettingsButtonsEnabled(False)
         self.theUIGraph.UIGR_SetDonationButtonsEnabled(False)
         
-        self.theGDAXControler.GDAX_InitializeGDAXConnexion()
+        self.theGDAXControler.GDAX_InitializeGDAXConnection()
         self.theUIGraph.UIGR_SetDonationButtonsEnabled(False)
         self.theInputDataHandler.INDH_PrepareHistoricDataSinceGivenHours(True, theConfig.NB_HISTORIC_DATA_HOURS_TO_PRELOAD_FOR_TRADING)
         
@@ -291,7 +291,7 @@ class AppState(object):
             
             if (bAPIDataHasChanged == True):
                 print("APPL - API data has changed")
-                pass # Nothing specific to do as GDAX will be asked to perform a new connexion
+                pass # Nothing specific to do as GDAX will be asked to perform a new connection
                              
             # Entry actions for Initialization state
             self.PerformInitializationStateEntryActions()
