@@ -15,7 +15,7 @@ Astibot bases its decisions on 2 real-time indicators:
 * Live trading mode (real-time trading)
 * Simulation mode (to backtest the settings)
 * Customizable MACD-like decision indicator (to detect buy and sell opportunities)
-* Supported Coinbase pro trading pairs: BTC-USD, BTC-EUR, ETH-USD, ETH-EUR, LTC-USD, LTC-EUR, BCH-USD, BCH-EUR, ETC-USD, ETC-EUR, ETH-BTC, BCH-BTC, LTC-BTC
+* Supported Coinbase pro trading pairs must be defined in the `src/GDAXCurrencies.py` file within the `get_all_pairs` method.
 
 ## Advanced features
 * Risk line: a customizable, real-time updated limit price limit above which Astibot will never buy
@@ -64,6 +64,6 @@ To understand the general software breakdown, a diagram is worth thousand words.
 
 ## Development and design improvements
 
-* Some modules are too big and could be splitted into more micro modules (UIGraph for example)
+* Some modules are too big and could be split into more micro modules (UIGraph for example)
 * Astibot was originally designed to trade fiat-crypto pairs. Recently, I added the support for BTC based pairs but I didn't have time to rename all the variable labelled "fiatXXX" that were orginally are designed to contain data about the fiat currency. So for example, variables fiatAccountBalance and cryptoAccountBalance should have more generic names like account1Balance, account2Balance.
 
