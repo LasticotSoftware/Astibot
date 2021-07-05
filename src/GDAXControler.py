@@ -9,6 +9,7 @@ from datetime import datetime
 import pytz
 from tzlocal import get_localzone
 from requests.exceptions import ConnectionError
+from GDAXCurrencies import GDAXCurrencies
 import math # truncate
 
 # This module is actually a Coinbae Pro handler
@@ -23,8 +24,9 @@ class GDAXControler(cbpro.OrderBook):
     
 
     def __init__(self, UIGraph, Settings):
-        
-        super(GDAXControler, self).__init__(product_id='BTC-USD', log_to=False)
+
+        first_currency = GDAXCurrencies.get_all_pairs()[0]
+        super(GDAXControler, self).__init__(product_id=first_currency, log_to=False)
         
         self.theUIGraph = UIGraph
         # Application settings data instance

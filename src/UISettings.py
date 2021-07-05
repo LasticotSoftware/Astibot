@@ -3,6 +3,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from PyQt5.QtWidgets import QFrame
 from PyQt5.Qt import QIntValidator
 from PyQt5.Qt import QDoubleValidator
+from GDAXCurrencies import GDAXCurrencies
 import ctypes # Message box popup
 
 import TradingBotConfig as theConfig
@@ -74,32 +75,7 @@ class UISettings(QtGui.QWidget):
             
         self.strTradingPair = self.theSettings.SETT_GetSettings()["strTradingPair"]
         self.strApplicableTradingPair = self.strTradingPair
-        if (self.strTradingPair == "BTC-USD"):
-            self.comboTradingPair.setCurrentIndex(0)
-        elif (self.strTradingPair == "BTC-EUR"):
-            self.comboTradingPair.setCurrentIndex(1)
-        elif (self.strTradingPair == "ETH-USD"):
-            self.comboTradingPair.setCurrentIndex(2)
-        elif (self.strTradingPair == "ETH-EUR"):
-            self.comboTradingPair.setCurrentIndex(3)
-        elif (self.strTradingPair == "LTC-USD"):
-            self.comboTradingPair.setCurrentIndex(4)
-        elif (self.strTradingPair == "LTC-EUR"):
-            self.comboTradingPair.setCurrentIndex(5)
-        elif (self.strTradingPair == "BCH-USD"):
-            self.comboTradingPair.setCurrentIndex(6)
-        elif (self.strTradingPair == "BCH-EUR"):
-            self.comboTradingPair.setCurrentIndex(7)                                                                    
-        elif (self.strTradingPair == "ETC-USD"):
-            self.comboTradingPair.setCurrentIndex(8)
-        elif (self.strTradingPair == "ETC-EUR"):
-            self.comboTradingPair.setCurrentIndex(9)
-        elif (self.strTradingPair == "BCH-BTC"):
-            self.comboTradingPair.setCurrentIndex(10)                                                                    
-        elif (self.strTradingPair == "ETH-BTC"):
-            self.comboTradingPair.setCurrentIndex(11)
-        elif (self.strTradingPair == "LTC-BTC"):
-            self.comboTradingPair.setCurrentIndex(12)            
+        self.comboTradingPair.setCurrentIndex(GDAXCurrencies.get_index_for_currency_pair(self.strTradingPair))
                                                           
         self.strFiatType = self.theSettings.SETT_GetSettings()["strFiatType"]
         self.strCryptoType = self.theSettings.SETT_GetSettings()["strCryptoType"]
@@ -192,59 +168,13 @@ class UISettings(QtGui.QWidget):
     
     def EventComboTradingPairChanged(self):
         print("UIST - Combo Trading pair set to: %s" % str(self.comboTradingPair.currentIndex()))
-        if (self.comboTradingPair.currentIndex() == 0):
-            self.strTradingPair = "BTC-USD"
-            self.strFiatType = "USD"
-            self.strCryptoType = "BTC"
-        elif (self.comboTradingPair.currentIndex() == 1):
-            self.strTradingPair = "BTC-EUR"
-            self.strFiatType = "EUR"
-            self.strCryptoType = "BTC"
-        elif (self.comboTradingPair.currentIndex() == 2):
-            self.strTradingPair = "ETH-USD"
-            self.strFiatType = "USD"
-            self.strCryptoType = "ETH"
-        elif (self.comboTradingPair.currentIndex() == 3):
-            self.strTradingPair = "ETH-EUR"
-            self.strFiatType = "EUR"
-            self.strCryptoType = "ETH"
-        elif (self.comboTradingPair.currentIndex() == 4):
-            self.strTradingPair = "LTC-USD"
-            self.strFiatType = "USD"
-            self.strCryptoType = "LTC"
-        elif (self.comboTradingPair.currentIndex() == 5):
-            self.strTradingPair = "LTC-EUR"
-            self.strFiatType = "EUR"
-            self.strCryptoType = "LTC"
-        elif (self.comboTradingPair.currentIndex() == 6):
-            self.strTradingPair = "BCH-USD"
-            self.strFiatType = "USD"
-            self.strCryptoType = "BCH"
-        elif (self.comboTradingPair.currentIndex() == 7):
-            self.strTradingPair = "BCH-EUR"
-            self.strFiatType = "EUR"
-            self.strCryptoType = "BCH"     
-        elif (self.comboTradingPair.currentIndex() == 8):
-            self.strTradingPair = "ETC-USD"
-            self.strFiatType = "USD"
-            self.strCryptoType = "ETC"
-        elif (self.comboTradingPair.currentIndex() == 9):
-            self.strTradingPair = "ETC-EUR"
-            self.strFiatType = "EUR"
-            self.strCryptoType = "ETC"          
-        elif (self.comboTradingPair.currentIndex() == 10):
-            self.strTradingPair = "BCH-BTC"
-            self.strFiatType = "BTC"
-            self.strCryptoType = "BCH"
-        elif (self.comboTradingPair.currentIndex() == 11):
-            self.strTradingPair = "ETH-BTC"
-            self.strFiatType = "BTC"
-            self.strCryptoType = "ETH"      
-        elif (self.comboTradingPair.currentIndex() == 12):
-            self.strTradingPair = "LTC-BTC"
-            self.strFiatType = "BTC"
-            self.strCryptoType = "LTC"                                                                                                           
-        else:
+        all_data = GDAXCurrencies.get_currencies_list()
+        try:
+            a_currency = all_data[self.comboTradingPair.currentIndex()]
+            self.strTradingPair = a_currency['full']
+            self.strFiatType = a_currency['fiat']
+            self.strCryptoType = a_currency['coin']
+        except IndexError:
             pass
         
         # Refresh labels that mention the currency
@@ -448,20 +378,9 @@ class UISettings(QtGui.QWidget):
         self.lblTradingPair.setContentsMargins(20,0,0,0)
         self.mainGridLayout2.addWidget(self.lblTradingPair, rowNumber, 0)
         self.comboTradingPair = QtGui.QComboBox()
-        self.comboTradingPair.setView(QtGui.QListView()); # Necessary to allow height change
-        self.comboTradingPair.addItem("BTC-USD")
-        self.comboTradingPair.addItem("BTC-EUR")
-        self.comboTradingPair.addItem("ETH-USD")
-        self.comboTradingPair.addItem("ETH-EUR")
-        self.comboTradingPair.addItem("LTC-USD")
-        self.comboTradingPair.addItem("LTC-EUR")
-        self.comboTradingPair.addItem("BCH-USD")
-        self.comboTradingPair.addItem("BCH-EUR")
-        self.comboTradingPair.addItem("ETC-USD")
-        self.comboTradingPair.addItem("ETC-EUR")    
-        self.comboTradingPair.addItem("BCH-BTC")
-        self.comboTradingPair.addItem("ETH-BTC")
-        self.comboTradingPair.addItem("LTC-BTC")               
+        self.comboTradingPair.setView(QtGui.QListView())  # Necessary to allow height change
+        for dictionary in GDAXCurrencies.get_currencies_list():
+            self.comboTradingPair.addItem(dictionary['full'])
         self.comboTradingPair.currentIndexChanged.connect(self.EventComboTradingPairChanged)
         self.comboTradingPair.setStyleSheet(self.STR_COMBO_STYLESHEET)
         self.mainGridLayout2.addWidget(self.comboTradingPair, rowNumber, 1)
