@@ -308,7 +308,7 @@ class UISettings(QtGui.QWidget):
         self.SeparatorLine2.setFixedHeight(15)
         
         # Trading Account layout ===========================================================
-        self.lblTitleTradingAccount = QtGui.QLabel("Coinbase Pro Connexion parameters")
+        self.lblTitleTradingAccount = QtGui.QLabel("Coinbase Pro Connection parameters")
         self.lblTitleTradingAccount.setStyleSheet(self.STR_QLABEL_TITLE_STYLESHEET);
         self.mainGridLayout1.addWidget(self.lblTitleTradingAccount, rowNumber, 0)
         rowNumber = rowNumber + 1
