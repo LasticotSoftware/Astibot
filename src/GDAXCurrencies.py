@@ -15,7 +15,8 @@ class GDAXCurrencies:
             "ETC-EUR",
             "BCH-BTC",
             "ETH-BTC",
-            "LTC-BTC"
+            "LTC-BTC",
+            "SOL-USD"
         ]
 
     @staticmethod

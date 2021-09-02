@@ -8,7 +8,7 @@ CONFIG_VERSION = "1.3.1"
 CONFIG_INPUT_MODE_IS_REAL_MARKET = True
 
 # Main ticker : Retrieves the next samples and processes them
-CONFIG_MAIN_TICK_DURATION_IN_MS = 200
+CONFIG_MAIN_TICK_DURATION_IN_MS = 10000
 
 # Terrestrial time between two retrieved sample. 
 #Should be equal to CONFIG_MAIN_TICK_DURATION_IN_MS in live mode, custom value in simulation mode that

@@ -20,7 +20,7 @@ class TransactionManager(object):
 
         self.FiatAccountBalance = 0
         self.FIATAccountBalanceSimulated = 0
-        self.initialFiatAccountBalance = 0 # Only necessary in Trading mode. In simulation mode, profit is only theoric
+        self.initialFiatAccountBalance = 0 # Only necessary in Trading mode. In simulation mode, profit is only theoretical
         self.initialInvestedFiatAmount = 0
         self.CryptoAccountBalance = 0
         self.cryptoAccountBalanceSimulated = 0
