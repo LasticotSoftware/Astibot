@@ -189,7 +189,7 @@ class UIGraph():
     # on the left shifting the whole graph
     def UIGR_ResetAllGraphData(self, applyToGraphs, startTimeStamp, nbPointsOnPlot):
 
-        print("UIGR - Reseting all graph data with applyToGraphs = %s, startTimeStamp = %s, nbPointsOnPlot = %s" % (applyToGraphs, startTimeStamp, nbPointsOnPlot))
+        print("UIGR - Resetting all graph data with applyToGraphs = %s, startTimeStamp = %s, nbPointsOnPlot = %s" % (applyToGraphs, startTimeStamp, nbPointsOnPlot))
         self.totalNbIterations = 0
         self.totalNbGraphUpdates = 0
         self.timeOfLastSampleDisplayed = 0
