@@ -1,36 +1,28 @@
+import cbpro
+from cbpro.public_client import PublicClient
+
 class GDAXCurrencies:
 
     @staticmethod
     def get_all_pairs():
-        return [
-            "BTC-USD",
-            "BTC-EUR",
-            "ETH-USD",
-            "ETH-EUR",
-            "LTC-USD",
-            "LTC-EUR",
-            "BCH-USD",
-            "BCH-EUR",
-            "ETC-USD",
-            "ETC-EUR",
-            "BCH-BTC",
-            "ETH-BTC",
-            "LTC-BTC"
-        ]
+        clientPublic = cbpro.PublicClient()
+        products = clientPublic.get_products()
+        return sorted(list(map(lambda x: x["id"], products)))
 
     @staticmethod
     def get_currencies_list():
         pairs = GDAXCurrencies.get_all_pairs()
-        map = []
+        product_map = []
+
         for pair in pairs:
             pieces = pair.split('-')
-            map.append({
+            product_map.append({
                 "full": pair,
                 "coin": pieces[0],
                 "fiat": pieces[1]
             })
 
-        return map
+        return product_map
 
     @staticmethod
     def get_index_for_currency_pair(pair):
